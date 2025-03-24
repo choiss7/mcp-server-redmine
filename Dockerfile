@@ -1,5 +1,5 @@
 # Node.js 공식 이미지를 기반으로 합니다.
-FROM node:22-alpine
+FROM node:18-alpine
 
 # 작업 디렉토리를 설정합니다.
 WORKDIR /app
