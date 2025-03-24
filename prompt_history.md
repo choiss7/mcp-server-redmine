@@ -136,47 +136,64 @@
 
 ### 프롬프트 16: Docker 빌드 오류 지속 - Node.js 버전 변경
 
+### 프롬프트 17: TypeScript 컴파일러 오류 해결
+
 ### 사용자 요청
 ```
-(venv) choipro@p1-192-168-219-55:~/mcp-server-redmine$ docker-compose up -d
-[+] Building 142.9s (8/10)                                                                                                                                                                                                    docker:default
+ 2 files changed, 25 insertions(+), 32 deletions(-)
+(venv) choipro@p1-192-168-219-55:~/mcp-server-redmine$ docker-compose  up -d
+[+] Building 149.6s (10/10) FINISHED                                                                                                                                                                                          docker:default
  => [mcp-server-redmine internal] load build definition from Dockerfile                                                                                                                                                                 0.0s
  => => transferring dockerfile: 566B                                                                                                                                                                                                    0.0s
- => [mcp-server-redmine internal] load metadata for docker.io/library/node:22-alpine                                                                                                                                                    1.5s
+ => [mcp-server-redmine internal] load metadata for docker.io/library/node:18-alpine                                                                                                                                                    2.0s
  => [mcp-server-redmine internal] load .dockerignore                                                                                                                                                                                    0.0s
  => => transferring context: 300B                                                                                                                                                                                                       0.0s
- => [mcp-server-redmine 1/6] FROM docker.io/library/node:22-alpine@sha256:9bef0ef1e268f60627da9ba7d7605e8831d5b56ad07487d24d1aa386336d1944                                                                                              0.0s
+ => [mcp-server-redmine 1/6] FROM docker.io/library/node:18-alpine@sha256:e0340f26173b41066d68e3fe9bfbdb6571ab3cad0a4272919a52e36f4ae56925                                                                                              5.7s
+ => => resolve docker.io/library/node:18-alpine@sha256:e0340f26173b41066d68e3fe9bfbdb6571ab3cad0a4272919a52e36f4ae56925                                                                                                                 0.0s
+ => => sha256:e0340f26173b41066d68e3fe9bfbdb6571ab3cad0a4272919a52e36f4ae56925 7.67kB / 7.67kB                                                                                                                                          0.0s
+ => => sha256:b33d7471a6a5106cceb3b6e4368841e06338ff6e5e8b2ff345e2e17f15902d7d 1.72kB / 1.72kB                                                                                                                                          0.0s
+ => => sha256:70649fe1a0d792c12299abc78e1bc691884f8a7b519a294c351caa0748531b7c 6.18kB / 6.18kB                                                                                                                                          0.0s
+ => => sha256:a5cf150cb3746a8af43a656f15a671bb84fa704ac2413cf1e57cc37d12afa838 40.01MB / 40.01MB                                                                                                                                        4.6s
+ => => sha256:f46e519824fbb18a1df4becc0a40665f5c1cd193e527b3b0e26683d10f140916 1.26MB / 1.26MB                                                                                                                                          1.5s
+ => => sha256:3d8c59f7308dbad7c144c50d7f2b78bdbb5ee2f158009c4c17aa8bdf56d74db0 444B / 444B                                                                                                                                              1.3s
+ => => extracting sha256:a5cf150cb3746a8af43a656f15a671bb84fa704ac2413cf1e57cc37d12afa838                                                                                                                                               0.9s
+ => => extracting sha256:f46e519824fbb18a1df4becc0a40665f5c1cd193e527b3b0e26683d10f140916                                                                                                                                               0.0s
+ => => extracting sha256:3d8c59f7308dbad7c144c50d7f2b78bdbb5ee2f158009c4c17aa8bdf56d74db0                                                                                                                                               0.0s
  => [mcp-server-redmine internal] load build context                                                                                                                                                                                    0.0s
  => => transferring context: 100.76kB                                                                                                                                                                                                   0.0s
- => CACHED [mcp-server-redmine 2/6] WORKDIR /app                                                                                                                                                                                        0.0s
- => CACHED [mcp-server-redmine 3/6] COPY package*.json ./                                                                                                                                                                               0.0s
- => ERROR [mcp-server-redmine 4/6] RUN npm install --legacy-peer-deps                                                                                                                                                                 141.3s
+ => [mcp-server-redmine 2/6] WORKDIR /app                                                                                                                                                                                               0.1s
+ => [mcp-server-redmine 3/6] COPY package*.json ./                                                                                                                                                                                      0.0s
+ => [mcp-server-redmine 4/6] RUN npm install --legacy-peer-deps                                                                                                                                                                       141.2s
+ => [mcp-server-redmine 5/6] COPY . .                                                                                                                                                                                                   0.1s
+ => ERROR [mcp-server-redmine 6/6] RUN npm run build                                                                                                                                                                                    0.4s
 ------                                                                                                                                                                                                                                       
- > [mcp-server-redmine 4/6] RUN npm install --legacy-peer-deps:
-141.2 npm error Exit handler never called!
-141.2 npm error This is an error with npm itself. Please report this error at:
-141.2 npm error   <https://github.com/npm/cli/issues>
-141.2 npm error A complete log of this run can be found in: /root/.npm/_logs/2025-03-24T07_20_36_087Z-debug-0.log
+ > [mcp-server-redmine 6/6] RUN npm run build:                                                                                                                                                                                               
+0.323 
+0.323 > @yonaka15/mcp-server-redmine@0.1.0 build
+0.323 > tsc
+0.323 
+0.328 sh: tsc: not found
 ------
-failed to solve: process "/bin/sh -c npm install --legacy-peer-deps" did not complete successfully: exit code: 1
+failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 127
 ```
 
 ### 수행 작업
 1. 문제 분석
-   - Node.js 22 버전에서 `--legacy-peer-deps` 플래그를 사용해도 npm 설치 오류 지속
-   - npm 자체의 내부 오류로 인해 "Exit handler never called!" 메시지 발생
+   - Docker 이미지 빌드 과정에서 TypeScript 컴파일러(tsc)를 찾을 수 없는 오류 발생
+   - npm run build 명령은 package.json에 정의된 대로 tsc를 실행하려고 시도
+   - Alpine 환경에서는 전역 설치된 tsc를 찾을 수 없음
 
 2. 해결 방법
-   - Node.js 버전을 18로 다운그레이드 
-   - Dockerfile에서 `FROM node:22-alpine`을 `FROM node:18-alpine`으로 변경
-   - 안정적인 LTS 버전을 사용하여 호환성 문제 해결
+   - npm run build 대신 로컬에 설치된 TypeScript 컴파일러를 직접 경로로 지정
+   - `RUN npm run build` 명령을 `RUN ./node_modules/.bin/tsc`로 변경
+   - node_modules 디렉토리 내에 설치된 TypeScript 컴파일러 바이너리를 직접 실행
 
 3. 변경사항 커밋 및 푸시
    - 수정된 Dockerfile을 GitHub 저장소에 푸시
-   - 커밋 메시지: "Dockerfile 수정: Node.js 버전을 22에서 18로 변경"
+   - 커밋 메시지: "Dockerfile 수정: tsc 명령어 직접 경로 지정"
 
 ### 해결 방법 설명
-Node.js 22는 아직 최신 버전으로 일부 패키지와 호환성 문제가 발생할 수 있습니다. Node.js 18은 LTS(장기 지원) 버전으로 더 안정적이며 package.json에 명시된 "engines" 필드의 요구사항(>=18)도 충족합니다. 이를 통해 npm 설치 과정에서 발생하는 내부 오류를 해결할 수 있습니다.
+Docker 컨테이너 내에서 npm run build를 실행할 때 tsc 명령어를 찾지 못하는 문제가 발생했습니다. npm install로 패키지를 설치하면 TypeScript는 로컬(프로젝트) 모듈로 설치되고 전역 명령어로 등록되지 않습니다. 이 문제를 해결하기 위해 로컬 모듈에 설치된 TypeScript 컴파일러 바이너리의 직접 경로(`./node_modules/.bin/tsc`)를 지정하여 실행했습니다. 이렇게 하면 전역 설치 없이 로컬에 설치된 TypeScript 컴파일러를 사용할 수 있습니다.
 
 ## 2024-03-24
 
