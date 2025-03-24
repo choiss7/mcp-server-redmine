@@ -135,11 +135,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 // Start server
 async function runServer() {
-  const transport = new StdioServerTransport({
-    port: config.server.port,
-  });
+  const transport = new StdioServerTransport();
   
-  console.log(`Proxy server will listen on port ${config.server.port}`);
+  console.log(`MCP 서버 포트 설정: ${config.server.port}. 클라이언트에서 이 포트로 연결해야 합니다.`);
   await server.connect(transport);
 }
 
