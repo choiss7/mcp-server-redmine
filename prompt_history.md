@@ -114,6 +114,16 @@
   - 변경사항 커밋 및 푸시
   - 프롬프트 히스토리 업데이트
 
+### 프롬프트 13: Docker 지원 추가
+- 요청 내용: 프로젝트를 Docker로 실행할 수 있도록 설정
+- 수행 작업:
+  - Dockerfile 생성 (Node.js 22 Alpine 이미지 기반)
+  - .dockerignore 파일 생성 (불필요한 파일 제외)
+  - docker-compose.yml 파일 생성 (서비스 구성)
+  - .env.example 파일 추가 (환경 변수 예제)
+  - README.md에 Docker 실행 방법 추가
+  - 변경사항 커밋 및 푸시
+
 ## 2024-03-24
 
 ### 프롬프트 1: 서버 포트 변경 요청
