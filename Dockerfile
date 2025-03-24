@@ -12,7 +12,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # TypeScript 코드를 빌드합니다.
-RUN ./node_modules/.bin/tsc
+RUN npx --no-install tsc
 
 # 환경 변수 설정
 ENV NODE_ENV=production
