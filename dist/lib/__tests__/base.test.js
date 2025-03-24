@@ -1,0 +1,83 @@
+import { jest, expect, describe, it, beforeEach, afterEach } from '@jest/globals';
+import { BaseClient } from '../client/base.js';
+import { mockResponse, mockErrorResponse } from './helpers/mocks.js';
+// テスト用にprotectedメソッドを公開したクラス
+class TestClient extends BaseClient {
+    async testRequest(path, options) {
+        return this.performRequest(path, options);
+    }
+    testEncodeParams(params) {
+        return this.encodeQueryParams(params);
+    }
+}
+describe('BaseClient', () => {
+    let client;
+    let mockFetch;
+    beforeEach(() => {
+        client = new TestClient();
+        mockFetch = jest.spyOn(global, 'fetch');
+    });
+    afterEach(() => {
+        mockFetch.mockReset();
+    });
+    describe('performRequest', () => {
+        it('performs a successful GET request', async () => {
+            // Arrange
+            const responseData = { data: 'test' };
+            mockFetch.mockImplementationOnce(() => Promise.resolve(mockResponse(responseData)));
+            // Act
+            const result = await client.testRequest('/test');
+            // Assert
+            expect(result).toEqual(responseData);
+            expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/test'), expect.objectContaining({
+                method: 'GET',
+                headers: expect.objectContaining({
+                    'X-Redmine-API-Key': expect.any(String),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                })
+            }));
+        });
+        it('handles API errors', async () => {
+            // Arrange
+            mockFetch.mockImplementationOnce(() => Promise.resolve(mockErrorResponse(404, ['Not found'])));
+            // Act & Assert
+            await expect(client.testRequest('/test')).rejects.toThrow('Redmine API error');
+        });
+    });
+    describe('encodeQueryParams', () => {
+        it('encodes query parameters correctly', () => {
+            // Arrange
+            const params = {
+                status_id: 'open',
+                assigned_to_id: 1,
+                include: ['attachments', 'journals']
+            };
+            // Act
+            const encoded = client.testEncodeParams(params);
+            const expectedParams = new URLSearchParams();
+            expectedParams.set('status_id', 'open');
+            expectedParams.set('assigned_to_id', '1');
+            expectedParams.set('include', 'attachments,journals');
+            // Assert
+            expect(encoded).toBe(expectedParams.toString());
+        });
+        it('handles empty parameters', () => {
+            // Act & Assert
+            expect(client.testEncodeParams({})).toBe('');
+        });
+        it('handles null and undefined values', () => {
+            // Arrange
+            const params = {
+                status_id: 'open',
+                assigned_to_id: undefined,
+                project_id: null
+            };
+            // Act
+            const encoded = client.testEncodeParams(params);
+            // Assert
+            expect(encoded).toBe('status_id=open');
+        });
+    });
+});
+//# sourceMappingURL=base.test.js.map
