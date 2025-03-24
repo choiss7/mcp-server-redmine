@@ -93,13 +93,23 @@
   - 프로젝트 빌드 테스트 (성공)
   - 프롬프트 히스토리 업데이트
 
-### 프롬프트 11: 서버 실행 오류 수정
+### 프롬프트 11: Linux 환경에서 서버 실행 오류 수정
 - 요청 내용: Linux 환경에서 서버 실행 시 발생하는 `this._stdin.on is not a function` 에러 해결
 - 수행 작업:
   - 오류 메시지 분석 (StdioServerTransport 클래스의 stdin 처리 문제)
   - src/handlers/index.ts 파일에서 StdioServerTransport 생성 방식 수정
   - process.stdin과 process.stdout 전달 코드 제거
   - 오류 처리 코드 개선 (process.exit(1) 추가)
+  - 빌드 테스트 (성공)
+  - 변경사항 커밋 및 푸시
+  - 프롬프트 히스토리 업데이트
+
+### 프롬프트 12: Linux 환경에서 서버 실행 오류 재발
+- 요청 내용: 이전과 같은 Linux 환경에서 발생하는 `this._stdin.on is not a function` 에러 해결
+- 수행 작업:
+  - 오류 메시지 재분석 (SDK 소스 코드에서 StdioServerTransport 생성자 확인)
+  - StdioServerTransport 클래스의 기본 생성자를 사용
+  - SDK 인수 없이 생성할 경우 내부적으로 process.stdin과 process.stdout을 사용하는 방식 확인
   - 빌드 테스트 (성공)
   - 변경사항 커밋 및 푸시
   - 프롬프트 히스토리 업데이트
