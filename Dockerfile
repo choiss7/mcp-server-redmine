@@ -4,6 +4,9 @@ FROM node:18-alpine
 # 작업 디렉토리를 설정합니다.
 WORKDIR /app
 
+# TypeScript를 전역으로 설치합니다.
+RUN npm install -g typescript
+
 # 패키지 파일을 복사하고 의존성을 설치합니다.
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
@@ -11,8 +14,8 @@ RUN npm install --legacy-peer-deps
 # 소스 코드를 복사합니다.
 COPY . .
 
-# TypeScript 컴파일러가 로컬 모듈에 설치되어 있으므로 직접 경로를 지정합니다.
-RUN ./node_modules/.bin/tsc
+# TypeScript 코드를 빌드합니다.
+RUN tsc
 
 # 환경 변수 설정
 ENV NODE_ENV=production
