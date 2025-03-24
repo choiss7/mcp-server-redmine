@@ -140,47 +140,52 @@
 
 ### 프롬프트 18: TypeScript 설치 오류 해결
 
+### 프롬프트 19: Docker 네트워크 연결 오류 해결
+
 ### 사용자 요청
 ```
 (venv) choipro@p1-192-168-219-55:~/mcp-server-redmine$ docker-compose  up -d
-[+] Building 1.0s (10/10) FINISHED                                                                                                                                                                                            docker:default
+[+] Building 86.6s (7/11)                                                                                                                                                                                                     docker:default
  => [mcp-server-redmine internal] load build definition from Dockerfile                                                                                                                                                                 0.0s
- => => transferring dockerfile: 642B                                                                                                                                                                                                    0.0s
- => [mcp-server-redmine internal] load metadata for docker.io/library/node:18-alpine                                                                                                                                                    0.6s
+ => => transferring dockerfile: 633B                                                                                                                                                                                                    0.0s
+ => [mcp-server-redmine internal] load metadata for docker.io/library/node:18-alpine                                                                                                                                                    0.7s
  => [mcp-server-redmine internal] load .dockerignore                                                                                                                                                                                    0.0s
  => => transferring context: 300B                                                                                                                                                                                                       0.0s
- => [mcp-server-redmine 1/6] FROM docker.io/library/node:18-alpine@sha256:e0340f26173b41066d68e3fe9bfbdb6571ab3cad0a4272919a52e36f4ae56925                                                                                              0.0s
- => [mcp-server-redmine internal] load build context                                                                                                                                                                                    0.0s
- => => transferring context: 100.83kB                                                                                                                                                                                                   0.0s
- => CACHED [mcp-server-redmine 2/6] WORKDIR /app                                                                                                                                                                                        0.0s
- => CACHED [mcp-server-redmine 3/6] COPY package*.json ./                                                                                                                                                                               0.0s
- => CACHED [mcp-server-redmine 4/6] RUN npm install --legacy-peer-deps                                                                                                                                                                  0.0s
- => [mcp-server-redmine 5/6] COPY . .                                                                                                                                                                                                   0.1s
- => ERROR [mcp-server-redmine 6/6] RUN ./node_modules/.bin/tsc                                                                                                                                                                          0.1s
+ => [mcp-server-redmine 1/7] FROM docker.io/library/node:18-alpine@sha256:e0340f26173b41066d68e3fe9bfbdb6571ab3cad0a4272919a52e36f4ae56925                                                                                              0.0s
+ => [mcp-server-redmine internal] load build context                                                                                                                                                                                    0.1s
+ => => transferring context: 100.82kB                                                                                                                                                                                                   0.1s
+ => CACHED [mcp-server-redmine 2/7] WORKDIR /app                                                                                                                                                                                        0.0s
+ => ERROR [mcp-server-redmine 3/7] RUN npm install -g typescript                                                                                                                                                                       85.8s
 ------                                                                                                                                                                                                                                       
- > [mcp-server-redmine 6/6] RUN ./node_modules/.bin/tsc:
-0.120 /bin/sh: ./node_modules/.bin/tsc: not found
+ > [mcp-server-redmine 3/7] RUN npm install -g typescript:
+85.79 npm error code EAI_AGAIN
+85.80 npm error syscall getaddrinfo
+85.80 npm error errno EAI_AGAIN
+85.80 npm error request to https://registry.npmjs.org/typescript failed, reason: getaddrinfo EAI_AGAIN registry.npmjs.org
+85.80 npm error A complete log of this run can be found in: /root/.npm/_logs/2025-03-24T07_35_34_968Z-debug-0.log
 ------
-failed to solve: process "/bin/sh -c ./node_modules/.bin/tsc" did not complete successfully: exit code: 127
+failed to solve: process "/bin/sh -c npm install -g typescript" did not complete successfully: exit code: 1
 ```
 
 ### 수행 작업
 1. 문제 분석
-   - node_modules/.bin/tsc 경로를 지정했으나 해당 파일을 찾을 수 없는 오류 발생
-   - npm install 명령으로 설치된 TypeScript가 .bin 디렉토리에 제대로 링크되지 않은 것으로 판단
-   - Alpine Linux 환경에서 패키지 설치 구조 문제 확인
+   - Docker 빌드 과정에서 npm 패키지 설치 시 네트워크 연결 오류 발생
+   - npm registry(registry.npmjs.org)에 접근할 수 없는 문제
+   - `EAI_AGAIN` 오류는 DNS 해결 실패를 의미
 
 2. 해결 방법
-   - TypeScript를 Docker 이미지에 전역으로 설치하는 방식으로 변경
-   - Dockerfile에 `RUN npm install -g typescript` 명령 추가
-   - 전역 명령어 tsc를 사용하도록 빌드 명령 변경
+   - 네트워크 의존성을 제거하는 빌드 전략으로 변경
+   - TypeScript를 전역 설치하고 Docker 내에서 컴파일하는 대신 로컬에서 미리 컴파일된 코드 사용
+   - Dockerfile에서 TypeScript 설치 및 빌드 단계 제거
+   - 대신 로컬에서 빌드한 `dist/` 디렉토리를 Docker 이미지에 직접 복사
 
 3. 변경사항 커밋 및 푸시
-   - 수정된 Dockerfile을 GitHub 저장소에 푸시
-   - 커밋 메시지: "Dockerfile 수정: TypeScript 전역 설치 추가"
+   - 로컬에서 `npm run build` 실행하여 TypeScript 컴파일 수행
+   - 수정된 Dockerfile과 컴파일된 dist/ 디렉토리를 GitHub 저장소에 푸시
+   - 커밋 메시지: "Dockerfile 수정: 네트워크 문제 우회를 위한 빌드 전략 변경"
 
 ### 해결 방법 설명
-Docker 컨테이너 내에서 로컬 TypeScript 바이너리 경로를 찾지 못하는 문제를 해결하기 위해, TypeScript를 전역 패키지로 설치하는 방식으로 변경했습니다. 이렇게 하면 전역 명령어 `tsc`를 Docker 빌드 과정에서 사용할 수 있게 됩니다. 전역 설치는 Alpine Linux 환경에서도 명령어 경로를 정확히 인식하므로 빌드 오류를 방지할 수 있습니다.
+Docker 빌드 과정에서 발생한 네트워크 연결 문제를 우회하기 위해, 네트워크에 의존하는 단계를 최소화했습니다. TypeScript를 Docker 이미지 내에서 설치하고 컴파일하는 대신, 로컬 환경에서 미리 컴파일한 JavaScript 파일(dist/ 디렉토리)을 Docker 이미지에 직접 복사하는 방식으로 변경했습니다. 이렇게 하면 Docker 빌드 과정에서 npm registry에 접근할 필요가 없어 네트워크 오류를 피할 수 있습니다.
 
 ## 2024-03-24
 
