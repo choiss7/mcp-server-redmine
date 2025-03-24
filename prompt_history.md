@@ -49,6 +49,15 @@
   - 0015-fix-tool-description-for-claude-desktop.ko.md 번역
   - 번역된 내용을 프롬프트 히스토리에 기록
 
+### 프롬프트 6: StdioServerTransport 타입 오류 수정
+- 요청 내용: 빌드 오류 해결 및 푸시
+- 수행 작업:
+  - 오류 메시지 분석 (port 속성이 ReadableBase 타입에 존재하지 않음)
+  - src/handlers/index.ts 파일에서 StdioServerTransport의 port 옵션 제거
+  - 로그 메시지 한국어로 변경
+  - 빌드 테스트 (성공)
+  - 변경사항 커밋 및 푸시
+
 ## 2024-03-24
 
 ### 프롬프트 1: 서버 포트 변경 요청
