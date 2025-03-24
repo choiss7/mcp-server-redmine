@@ -135,13 +135,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 // Start server
 async function runServer() {
+  // Log port configuration before creating transport
+  console.log(`MCP server port configured: ${config.server.port}. Clients should connect to this port.`);
+  
   const transport = new StdioServerTransport(process.stdin, process.stdout);
   
-  console.log(`MCP 서버 포트 설정: ${config.server.port}. 클라이언트에서 이 포트로 연결해야 합니다.`);
   try {
     await server.connect(transport);
   } catch (error) {
-    console.error("서버 연결 오류:", error);
+    console.error("Server connection error:", error);
     throw error;
   }
 }
