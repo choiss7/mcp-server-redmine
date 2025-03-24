@@ -136,15 +136,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 // Start server
 async function runServer() {
   // Log port configuration before creating transport
-  console.log(`MCP server port configured: ${config.server.port}. Clients should connect to this port.`);
-  
-  const transport = new StdioServerTransport(process.stdin, process.stdout);
+  console.log(`Proxy server will listen on port ${config.server.port}`);
   
   try {
+    // stdin과 stdout을 직접 전달하지 않고 transport 생성
+    const transport = new StdioServerTransport();
     await server.connect(transport);
   } catch (error) {
-    console.error("Server connection error:", error);
-    throw error;
+    console.error("Fatal error starting server:", error);
+    process.exit(1);
   }
 }
 
