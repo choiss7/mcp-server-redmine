@@ -124,6 +124,14 @@
   - README.md에 Docker 실행 방법 추가
   - 변경사항 커밋 및 푸시
 
+### 프롬프트 14: Docker 실행 문제 해결
+- 요청 내용: Docker 실행 오류 해결
+- 수행 작업:
+  - Docker 설치 및 실행 상태 확인
+  - Docker Desktop이 실행되지 않은 상태 확인
+  - Docker Desktop 시작 필요성 안내
+  - Docker context 확인 및 문제 진단
+
 ## 2024-03-24
 
 ### 프롬프트 1: 서버 포트 변경 요청
