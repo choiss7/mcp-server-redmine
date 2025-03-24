@@ -11,8 +11,8 @@ RUN npm install --legacy-peer-deps
 # 소스 코드를 복사합니다.
 COPY . .
 
-# 미리 컴파일된 TypeScript 코드를 사용합니다.
-COPY dist/ /app/dist/
+# TypeScript 코드를 빌드합니다.
+RUN npm run build
 
 # 환경 변수 설정
 ENV NODE_ENV=production
