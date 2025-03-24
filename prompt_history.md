@@ -58,6 +58,15 @@
   - 빌드 테스트 (성공)
   - 변경사항 커밋 및 푸시
 
+### 프롬프트 7: 서버 실행 오류 수정
+- 요청 내용: 서버 실행 시 발생하는 `this._stdin.on is not a function` 에러 해결
+- 수행 작업:
+  - SDK 소스 코드 분석 및 StdioServerTransport 생성자 확인
+  - process.stdin과 process.stdout을 명시적으로 전달하도록 코드 수정
+  - try-catch 구문 추가하여 오류 처리 개선
+  - 빌드 테스트 (성공)
+  - 변경사항 커밋 및 푸시
+
 ## 2024-03-24
 
 ### 프롬프트 1: 서버 포트 변경 요청
