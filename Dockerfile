@@ -11,8 +11,8 @@ RUN npm install --legacy-peer-deps
 # 소스 코드를 복사합니다.
 COPY . .
 
-# TypeScript 코드를 빌드합니다.
-RUN npm run build
+# TypeScript 컴파일러가 로컬 모듈에 설치되어 있으므로 직접 경로를 지정합니다.
+RUN ./node_modules/.bin/tsc
 
 # 환경 변수 설정
 ENV NODE_ENV=production
