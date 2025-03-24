@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mcp-server-redmine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - REDMINE_API_KEY=${REDMINE_API_KEY}
+      - REDMINE_HOST=${REDMINE_HOST}
+      - SERVER_NAME=${SERVER_NAME}
+      - SERVER_VERSION=${SERVER_VERSION}
+      - MCP_SERVER_PORT=3003
+    volumes:
+      - ./dist:/app/dist
+    restart: unless-stopped 

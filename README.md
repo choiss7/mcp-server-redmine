@@ -204,3 +204,57 @@ MIT
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 - [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
 - [Redmine](https://www.redmine.org/)
+
+## Docker로 실행하기
+
+### 사전 준비
+
+1. [Docker](https://www.docker.com/get-started) 설치
+2. [Docker Compose](https://docs.docker.com/compose/install/) 설치 (대부분의 Docker 설치에 포함됨)
+
+### 환경 변수 설정
+
+`.env.example` 파일을 `.env` 파일로 복사하고 필요한 값을 설정합니다:
+
+```bash
+cp .env.example .env
+# .env 파일을 편집하여 REDMINE_API_KEY와 REDMINE_HOST 등을 설정합니다.
+```
+
+### Docker 이미지 빌드 및 실행
+
+Docker Compose를 사용하여 서비스를 빌드하고 실행합니다:
+
+```bash
+docker-compose up -d
+```
+
+서비스 실행 상태 확인:
+
+```bash
+docker-compose ps
+```
+
+로그 확인:
+
+```bash
+docker-compose logs -f
+```
+
+서비스 중지:
+
+```bash
+docker-compose down
+```
+
+### 도커 이미지만 사용하기
+
+Docker Compose 없이 직접 이미지를 빌드하고 실행할 수도 있습니다:
+
+```bash
+# 이미지 빌드
+docker build -t mcp-server-redmine .
+
+# 컨테이너 실행
+docker run -p 3003:3003 --env-file .env -d mcp-server-redmine
+```
