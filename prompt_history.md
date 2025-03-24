@@ -39,6 +39,16 @@
   - 모듈 분할(0003) 번역
   - 번역된 파일 커밋 및 푸시 
 
+### 프롬프트 5: docs/adr 폴더의 나머지 마크다운 파일들을 한국어로 번역해 주세요
+- 요청 내용: 나머지 ADR 문서 한국어 번역
+- 수행 작업:
+  - 0011-redefine-tools-based-on-redmine-api.ko.md 번역
+  - 0012-mcp-response-validation.ko.md 번역
+  - 0013-sdk-implementation.ko.md 번역
+  - 0014-mcp-response-validation.ko.md 번역
+  - 0015-fix-tool-description-for-claude-desktop.ko.md 번역
+  - 번역된 내용을 프롬프트 히스토리에 기록
+
 ## 2024-03-24
 
 ### 프롬프트 1: 서버 포트 변경 요청
@@ -86,5 +96,10 @@ docs/adr 폴더의 마크다운 파일들을 한국어로 번역해 주세요.
    - 0008-implement-users-resource.ko.md (Users 리소스 추가 구현)
    - 0009-split-handlers.ko.md (핸들러 모듈 분할)
    - 0010-project-related-tools-testing.ko.md (프로젝트 관련 도구 테스트 실시)
+   - 0011-redefine-tools-based-on-redmine-api.ko.md (Redmine API 기반 도구 재정의)
+   - 0012-mcp-response-validation.ko.md (MCP 응답 유효성 검증)
+   - 0013-sdk-implementation.ko.md (MCP SDK 구현으로 마이그레이션)
+   - 0014-mcp-response-validation.ko.md (MCP 응답 유효성 검증 구현)
+   - 0015-fix-tool-description-for-claude-desktop.ko.md (Claude Desktop용 도구 설명 수정)
 3. 번역된 파일들을 Git에 커밋 및 푸시
 4. 프롬프트 히스토리 파일 업데이트 
