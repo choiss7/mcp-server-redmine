@@ -139,7 +139,7 @@ async function runServer() {
   console.log(`Proxy server will listen on port ${config.server.port}`);
   
   try {
-    // stdin과 stdout을 직접 전달하지 않고 transport 생성
+    // 기본 생성자를 사용하여 생성 - 내부적으로 process.stdin과 process.stdout을 사용
     const transport = new StdioServerTransport();
     await server.connect(transport);
   } catch (error) {
