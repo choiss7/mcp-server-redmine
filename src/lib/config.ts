@@ -4,60 +4,40 @@ import dotenv from 'dotenv';
 // .envファイルの読み込み
 dotenv.config();
 
-// 設定スキーマの定義
-const ConfigSchema = z.object({
-  // RedmineのAPI設定
-  redmine: z.object({
-    apiKey: z.string({
-      required_error: "REDMINE_API_KEY environment variable is required",
-    }),
-    host: z
-      .string({
-        required_error: "REDMINE_HOST environment variable is required",
-      })
-      .url("REDMINE_HOST must be a valid URL"),
-  }),
-
-  // サーバー設定
-  server: z.object({
-    name: z.string().default("@yonaka15/mcp-server-redmine"),
-    version: z.string().default("0.1.0"),
-    port: z.coerce.number().default(3000),
-  }),
+// 環境変数のバリデーション
+const envSchema = z.object({
+  REDMINE_URL: z.string().url().optional(),
+  REDMINE_API_KEY: z.string().optional(),
+  MCP_SERVER_PORT: z.string().regex(/^\d+$/).optional(),
+  SERVER_NAME: z.string().optional(),
+  SERVER_VERSION: z.string().optional(),
 });
 
-// 設定の型定義
-export type Config = z.infer<typeof ConfigSchema>;
-
-// 環境変数からの設定読み込み
-function loadConfig(): Config {
-  return ConfigSchema.parse({
-    redmine: {
-      apiKey: process.env.REDMINE_API_KEY,
-      host: process.env.REDMINE_HOST,
-    },
-    server: {
-      name: process.env.SERVER_NAME ?? "@yonaka15/mcp-server-redmine",
-      version: process.env.SERVER_VERSION ?? "0.1.0",
-      port: process.env.MCP_SERVER_PORT ?? 3000,
-    },
-  });
-}
-
-// 設定のバリデーションとエクスポート
-let config: Config;
-try {
-  config = loadConfig();
-} catch (error) {
-  if (error instanceof z.ZodError) {
-    console.error("Configuration error:");
-    error.errors.forEach((err) => {
-      console.error(`- ${err.path.join(".")}: ${err.message}`);
-    });
-  } else {
-    console.error("Unknown error loading configuration:", error);
+// バリデーション実行
+const validateEnv = (): z.infer<typeof envSchema> => {
+  const result = envSchema.safeParse(process.env);
+  if (!result.success) {
+    console.error("❌ 環境変数のバリデーションエラー:");
+    console.error(result.error.errors);
+    return process.env as z.infer<typeof envSchema>;
   }
-  process.exit(1);
-}
+  return result.data;
+};
+
+// バリデーション済み環境変数
+const env = validateEnv();
+
+// 設定オブジェクト
+const config = {
+  server: {
+    name: process.env.SERVER_NAME ?? "@yonaka15/mcp-server-redmine",
+    version: process.env.SERVER_VERSION ?? "0.1.0",
+    port: parseInt(process.env.MCP_SERVER_PORT || "3000", 10),
+  },
+  redmine: {
+    url: process.env.REDMINE_URL ?? "http://localhost:3001",
+    apiKey: process.env.REDMINE_API_KEY ?? "",
+  },
+};
 
 export default config;
