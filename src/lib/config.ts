@@ -22,6 +22,7 @@ const ConfigSchema = z.object({
   server: z.object({
     name: z.string().default("@yonaka15/mcp-server-redmine"),
     version: z.string().default("0.1.0"),
+    port: z.coerce.number().default(3000),
   }),
 });
 
@@ -38,6 +39,7 @@ function loadConfig(): Config {
     server: {
       name: process.env.SERVER_NAME ?? "@yonaka15/mcp-server-redmine",
       version: process.env.SERVER_VERSION ?? "0.1.0",
+      port: process.env.MCP_SERVER_PORT ?? 3000,
     },
   });
 }

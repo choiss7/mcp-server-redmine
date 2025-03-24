@@ -135,7 +135,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 // Start server
 async function runServer() {
-  const transport = new StdioServerTransport();
+  const transport = new StdioServerTransport({
+    port: config.server.port,
+  });
+  
+  console.log(`Proxy server will listen on port ${config.server.port}`);
   await server.connect(transport);
 }
 
