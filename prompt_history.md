@@ -144,46 +144,56 @@
 
 ### 프롬프트 20: Docker 빌드 dist 디렉토리 오류 해결
 
+### 프롬프트 21: TypeScript 빌드 오류 지속
+
 ### 사용자 요청
 ```
+ Dockerfile        |  4 ++--
+ prompt_history.md | 52 +++++++++++++++++++++++++---------------------------
+ 2 files changed, 27 insertions(+), 29 deletions(-)
 (venv) choipro@p1-192-168-219-55:~/mcp-server-redmine$ docker-compose  up -d
-[+] Building 1.3s (10/10) FINISHED                                                                                                                                                                                            docker:default
+[+] Building 1.1s (10/10) FINISHED                                                                                                                                                                                            docker:default
  => [mcp-server-redmine internal] load build definition from Dockerfile                                                                                                                                                                 0.0s
- => => transferring dockerfile: 590B                                                                                                                                                                                                    0.0s
- => [mcp-server-redmine internal] load metadata for docker.io/library/node:18-alpine                                                                                                                                                    1.3s
+ => => transferring dockerfile: 566B                                                                                                                                                                                                    0.0s
+ => [mcp-server-redmine internal] load metadata for docker.io/library/node:18-alpine                                                                                                                                                    0.7s
  => [mcp-server-redmine internal] load .dockerignore                                                                                                                                                                                    0.0s
  => => transferring context: 300B                                                                                                                                                                                                       0.0s
  => [mcp-server-redmine internal] load build context                                                                                                                                                                                    0.0s
- => => transferring context: 100.78kB                                                                                                                                                                                                   0.0s
+ => => transferring context: 100.76kB                                                                                                                                                                                                   0.0s
  => [mcp-server-redmine 1/6] FROM docker.io/library/node:18-alpine@sha256:e0340f26173b41066d68e3fe9bfbdb6571ab3cad0a4272919a52e36f4ae56925                                                                                              0.0s
  => CACHED [mcp-server-redmine 2/6] WORKDIR /app                                                                                                                                                                                        0.0s
  => CACHED [mcp-server-redmine 3/6] COPY package*.json ./                                                                                                                                                                               0.0s
  => CACHED [mcp-server-redmine 4/6] RUN npm install --legacy-peer-deps                                                                                                                                                                  0.0s
  => CACHED [mcp-server-redmine 5/6] COPY . .                                                                                                                                                                                            0.0s
- => ERROR [mcp-server-redmine 6/6] COPY dist/ /app/dist/                                                                                                                                                                                0.0s
+ => ERROR [mcp-server-redmine 6/6] RUN npm run build                                                                                                                                                                                    0.4s
+------                                                                                                                                                                                                                                       
+ > [mcp-server-redmine 6/6] RUN npm run build:                                                                                                                                                                                               
+0.333 
+0.333 > @yonaka15/mcp-server-redmine@0.1.0 build
+0.333 > tsc
+0.333 
+0.338 sh: tsc: not found
 ------
- > [mcp-server-redmine 6/6] COPY dist/ /app/dist/:
-------
-failed to solve: failed to compute cache key: failed to calculate checksum of ref 0ffeb984-5da9-4055-ad23-7677eaaf937d::0y28tjah1o0k59zkn31f38pw3: "/dist": not found
+failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 127
 ```
 
 ### 수행 작업
 1. 문제 분석
-   - Docker 빌드 과정에서 `dist/` 디렉토리를 찾을 수 없는 오류 발생
-   - `COPY dist/ /app/dist/` 명령을 실행할 때 빌드 컨텍스트에 해당 디렉토리가 없음
-   - 이전의 로컬 빌드 후 Docker로 복사하는 전략에 문제 발생
+   - Docker 컨테이너 내에서 `npm run build` 명령 실행 시 TypeScript 컴파일러(tsc)를 찾을 수 없는 오류 지속
+   - package.json의 build 스크립트는 tsc 명령을 실행하지만, Alpine Linux 환경에서 명령을 찾지 못함
+   - npm으로 설치된 로컬 TypeScript 바이너리가 PATH에 추가되지 않는 문제
 
 2. 해결 방법
-   - 컨테이너 내부에서 TypeScript 빌드를 실행하도록 Dockerfile 수정
-   - `COPY dist/ /app/dist/` 명령을 `RUN npm run build`로 변경
-   - 이를 통해 컨테이너 내부에서 소스 코드를 빌드하도록 변경
+   - npm 스크립트 대신 npx를 사용하여 TypeScript 컴파일러 직접 실행
+   - `RUN npm run build` 명령을 `RUN npx tsc`로 변경
+   - npx는 node_modules/.bin 디렉토리에 있는 바이너리를 자동으로 찾아 실행
 
 3. 변경사항 커밋 및 푸시
    - 수정된 Dockerfile을 GitHub 저장소에 푸시
-   - 커밋 메시지: "Dockerfile 수정: 컨테이너 내부에서 TypeScript 빌드 실행"
+   - 커밋 메시지: "Dockerfile 수정: npm run build 대신 npx tsc 사용"
 
 ### 해결 방법 설명
-앞서 네트워크 연결 문제를 우회하기 위해 로컬에서 미리 빌드한 코드를 사용하는 방식으로 변경했으나, Linux 환경에서는 `dist/` 디렉토리가 빌드 컨텍스트에 존재하지 않아 오류가 발생했습니다. 이 문제를 해결하기 위해 Docker 이미지 내부에서 TypeScript 코드를 직접 빌드하도록 수정했습니다. 이 방식은 네트워크 연결이 원활한 환경에서 보다 안정적인 빌드 프로세스를 제공합니다.
+Docker 컨테이너의 Alpine Linux 환경에서 `npm run build` 명령 실행 시 TypeScript 컴파일러를 찾지 못하는 문제를 해결하기 위해 npx를 사용했습니다. npx는 로컬로 설치된 Node.js 패키지의 실행 파일을 쉽게 실행할 수 있게 해주는 도구로, node_modules/.bin 디렉토리에 있는 바이너리를 자동으로 찾아 실행합니다. 이를 통해 PATH 환경 변수에 의존하지 않고도 TypeScript 컴파일러를 실행할 수 있어 빌드 오류를 해결할 수 있습니다.
 
 ## 2024-03-24
 
